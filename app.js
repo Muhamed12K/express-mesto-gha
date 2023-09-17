@@ -30,7 +30,7 @@ app.use('/', routeUsers);
 app.use('/', routeCards);
 
 app.all('*', function(req, res){
-  res.send('not found', 404);
+  res.send('', 404);
 });
 
 app.listen(PORT);

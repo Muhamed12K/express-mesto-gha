@@ -14,8 +14,11 @@ function createUser(req, res) {
     // вернём записанные в базу данные
     .then(user => res.send({ data: user }))
     // данные не записались, вернём ошибку
-    .catch(err => res.status(ERROR_INTERNAL_SERVER).send({ message: err }));
-
+    .catch((err) => (
+      err.name === 'ValidationError'
+        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при создании пользователя' })
+        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
+    ));
 }
 
 function getUsersInfo(req, res) {
@@ -54,7 +57,11 @@ function updateUser(req, res)
 
       return res.send({ user });
     })
-}
+    .catch((err) => (
+      err.name === 'ValidationError'
+        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении пользователя' })
+        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
+    ));}
 
 function updateUserAvatar(req, res)
 {
@@ -67,6 +74,11 @@ function updateUserAvatar(req, res)
 
       return res.send({ user });
   })
+    .catch((err) => (
+      err.name === 'ValidationError'
+        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении аватара' })
+        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
+    ));
 }
 
 module.exports = {
