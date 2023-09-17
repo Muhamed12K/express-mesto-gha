@@ -10,12 +10,11 @@ function createUser(req, res) {
     name, about, avatar,
   } = req.body;
 
-
   User.create({ name, about, avatar })
     // вернём записанные в базу данные
     .then(user => res.send({ data: user }))
     // данные не записались, вернём ошибку
-    .catch(err => res.status(ERROR_INTERNAL_SERVER).send({ message: 'Произошла ошибка' }));
+    .catch(err => res.status(ERROR_INTERNAL_SERVER).send({ message: err }));
 
 }
 
