@@ -53,15 +53,22 @@ function updateUser(req, res)
     .then((user) => {
       user.name = name;
       user.about = about;
-      user.save();
+      error = user.validateSync();
 
-      return res.send({ user });
+      if (!error) {
+        return res.send({ user });
+      }
+
+      res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении пользователя' })
     })
     .catch((err) => (
       err.name === 'ValidationError'
         ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении пользователя' })
-        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
-    ));}
+        : res.status(ERROR_INTERNAL_SERVER).send({ message: err })
+    ));
+
+
+}
 
 function updateUserAvatar(req, res)
 {
@@ -70,10 +77,14 @@ function updateUserAvatar(req, res)
   User.findById(req.user._id)
     .then((user) => {
       user.avatar = avatar;
-      user.save();
+      error = user.validateSync();
 
-      return res.send({ user });
-  })
+      if (!error) {
+        return res.send({ user });
+      }
+
+      res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении аватара' })
+    })
     .catch((err) => (
       err.name === 'ValidationError'
         ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении аватара' })
