@@ -32,7 +32,7 @@ app.use('/', routeCards);
 app.all('*', function(req, res){
   res.setHeader('content-type', 'text/html; charset=utf-8');
   res.status(404);
-  res.send({ message: 'not found'});
+  res.send();
 });
 
 app.listen(PORT);
