@@ -1,34 +1,93 @@
 const User = require('../models/user');
-const {
-  ERROR_INACCURATE_DATA,
-  ERROR_NOT_FOUND,
-  ERROR_INTERNAL_SERVER,
-} = require('../errors/errors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-function createUser(req, res) {
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
+const InaccurateDataError = require('../errors/InaccurateDataError');
+
+function createUser(req, res, next) {
   const {
-    name, about, avatar,
+    email, password, name, about, avatar,
   } = req.body;
 
-  User.create({ name, about, avatar })
-    // вернём записанные в базу данные
-    .then(user => res.send({ data: user }))
-    // данные не записались, вернём ошибку
-    .catch((err) => (
-      err.name === 'ValidationError'
-        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при создании пользователя' })
-        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
-    ));
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    }))
+    .then((user) => {
+      const { _id } = user;
+
+        return res.status(201).send({
+          email,
+          name,
+          about,
+          avatar,
+          _id,
+        });
+      })
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким электронным адресом уже зарегистрирован'));
+      } else if (err.name === 'ValidationError') {
+        next(new InaccurateDataError('Переданы некорректные данные при регистрации пользователя'));
+      } else {
+        next(err);
+      }
+    });
 }
 
-function getUsersInfo(req, res) {
+function loginUser(req, res, next) {
+  const { email, password } = req.body;
+  const secretSigningKey = '0f05cafa879700c8e152aa60d5f9543b2d7e3f5afc522bbca634c7205a1d74d0';
+
+  User
+    .findUserByCredentials(email, password)
+    .then(({ _id: userId }) => {
+      if (userId) {
+        const token = jwt.sign(
+          {userId},
+          secretSigningKey,
+          {expiresIn: '7d'},
+        );
+
+        return res.send({ _id: token });
+      }
+      throw new UnauthorizedError('Неправильные почта или пароль');
+    })
+    .catch(next);
+}
+
+function getCurrentUserInfo(req, res, next) {
+  User
+    .findById(req.user)
+    .then((user) => {
+      if (user) return res.send({ user });
+
+      throw new NotFoundError('Пользователь с таким id не найден');
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new InaccurateDataError('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
+}
+
+function getUsersInfo(_, res, next) {
   User
     .find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 }
 
-function getUserInfoId(req, res) {
+function getUserInfoId(req, res, next) {
   const { id } = req.params;
 
   User
@@ -36,60 +95,68 @@ function getUserInfoId(req, res) {
     .then((user) => {
       if (user) return res.send({ user });
 
-      return res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
+      throw new NotFoundError('Пользователь с таким id не найден');
     })
-    .catch((err) => (
-      err.name === 'CastError'
-        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Передан некорректный id' })
-        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
-    ));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new InaccurateDataError('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
 }
 
-function updateUser(req, res)
-{
+function updateUser(req, res, next) {
   const {name, about} = req.body;
+  const { userId } = req.user;
 
-  User.findById(req.user._id)
+  User
+    .findByIdAndUpdate(
+      userId,
+      {
+        name,
+        about,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
     .then((user) => {
-      user.name = name;
-      user.about = about;
-      error = user.validateSync();
+      if (user) return res.send({user});
 
-      if (!error) {
-        return res.send({ user });
-      }
-
-      res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении пользователя' })
+      throw new NotFoundError('Данные по указанному id не найдены');
     })
-    .catch((err) => (
-      err.name === 'ValidationError'
-        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении пользователя' })
-        : res.status(ERROR_INTERNAL_SERVER).send({ message: err })
-    ));
-
-
+    .catch(next);
 }
 
-function updateUserAvatar(req, res)
-{
+function updateUserAvatar(req, res, next) {
   const {avatar} = req.body;
+  const { userId } = req.user;
 
-  User.findById(req.user._id)
+  User
+    .findByIdAndUpdate(
+      userId,
+      {
+        avatar,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
     .then((user) => {
-      user.avatar = avatar;
-      error = user.validateSync();
+      if (user) return res.send({ user });
 
-      if (!error) {
-        return res.send({ user });
-      }
-
-      res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении аватара' })
+      throw new NotFoundError('Пользователь с таким id не найден');
     })
-    .catch((err) => (
-      err.name === 'ValidationError'
-        ? res.status(ERROR_INACCURATE_DATA).send({ message: 'Переданы некорректные данные при обновлении аватара' })
-        : res.status(ERROR_INTERNAL_SERVER).send({ message: 'На сервере произошла ошибка' })
-    ));
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля пользователя'));
+      } else {
+        next(err);
+      }
+    });
 }
 
 module.exports = {
@@ -97,5 +164,7 @@ module.exports = {
   getUsersInfo,
   getUserInfoId,
   updateUserAvatar,
-  updateUser
+  updateUser,
+  loginUser,
+  getCurrentUserInfo
 };
