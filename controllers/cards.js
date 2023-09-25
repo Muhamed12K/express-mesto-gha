@@ -23,7 +23,6 @@ function createCard(req, res, next) {
 function receiveCards(_, res, next) {
   Card
     .find({})
-    .populate(['owner', 'likes'])
     .then((cards) => res.send({ data: cards }))
     .catch(next);
 }
@@ -107,6 +106,7 @@ function deleteCard(req, res, next) {
         .then(() => res.send({ data: card }))
         .catch(next);
     })
+    .catch(next);
 }
 
 module.exports = {

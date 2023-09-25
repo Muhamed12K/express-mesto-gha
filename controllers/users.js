@@ -65,7 +65,7 @@ function loginUser(req, res, next) {
 
 function getCurrentUserInfo(req, res, next) {
   User
-    .findById(req.user)
+    .findById(req._id)
     .then((user) => {
       if (user) return res.send({ user });
 

@@ -44,17 +44,7 @@ app.use('/', routeUsers);
 app.use('/', routeCards);
 
 app.use((req, res, next) => next(new NotFoundError('Страницы по запрошенному URL не существует')));
-app.all('*', function(req, res){
-  res.status(404);
-  res.send({ message: 'not found'});
-});
-
-
-// app.use((err, req, res, next) => {
-//   res.status(500).send({ message: err.message });
-// });
 app.use(errors());
-
 app.use(errorHandler);
 
 app.listen(PORT);

@@ -18,7 +18,7 @@ const { celebrate, Joi } = require('celebrate');
 
   router.get('/:id', celebrate({
     params: Joi.object().keys({
-      id: Joi.string().min(24).max(24),
+      cardId: Joi.string().length(24).hex().required(),
     }),
   }), getUserInfoId);
 
