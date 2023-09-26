@@ -96,7 +96,7 @@ function deleteCard(req, res, next) {
       _id: cardId,
     })
     .then((card) => {
-      if (!card) throw new NotFoundError('Данные по указанному id не найдены');
+      // if (!card) throw new NotFoundError('Данные по указанному id не найдены');
 
       const { owner: cardOwnerId } = card;
       if (cardOwnerId.valueOf() !== userId) throw new ForbiddenError('Нет прав доступа');
