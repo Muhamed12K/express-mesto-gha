@@ -2,16 +2,15 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
   const {
-    createUser,
     getUsersInfo,
+    getCurrentUserInfo,
     getUserInfoId,
+
     updateUserAvatar,
     updateUser,
-    getCurrentUserInfo
   } = require('../controllers/users');
 
   // add patch
-  router.post('/users', createUser);
 
   router.get('/', getUsersInfo);
   router.get('/me', getCurrentUserInfo);

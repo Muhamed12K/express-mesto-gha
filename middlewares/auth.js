@@ -20,7 +20,7 @@ module.exports = (req, _, next) => {
     return next(new UnauthorizedError('Неправильные почта или пароль'));
   }
 
-  req.user = payload._id;
+  req.user = payload;
 
   return next();
 };

@@ -6,25 +6,23 @@ const { errors } = require('celebrate');
 
 const limiter = require('./middlewares/rateLimiter');
 
-const routeUsers = require('./routes/users');
-const routeCards = require('./routes/cards');
-
 const routeSignup = require('./routes/signup');
 const routeSignin = require('./routes/signin');
 
 const auth = require('./middlewares/auth');
 
+const routeUsers = require('./routes/users');
+const routeCards = require('./routes/cards');
+
 const NotFoundError = require('./errors/NotFoundError');
 const errorHandler = require('./middlewares/errorHandler');
-
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
-  useNewUrlParser: true,
-});
 
 const { PORT = 3000 } = process.env;
 
 mongoose.set('strictQuery', true);
-
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+  useNewUrlParser: true,
+});
 
 const app = express();
 

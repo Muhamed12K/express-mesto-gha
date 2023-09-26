@@ -3,9 +3,11 @@ const { celebrate, Joi } = require('celebrate');
 
 const {
   createCard,
+
   receiveCards,
   likeCard,
   dislikeCard,
+
   deleteCard,
 } = require('../controllers/cards');
 

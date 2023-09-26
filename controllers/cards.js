@@ -6,7 +6,7 @@ const NotFoundError = require('../errors/NotFoundError');
 
 function createCard(req, res, next) {
   const { name, link } = req.body;
-  const { _id: userId } = req.user;
+  const { userId } = req.user;
 
   Card
     .create({ name, link, owner: userId })
@@ -29,7 +29,7 @@ function receiveCards(_, res, next) {
 
 function likeCard(req, res, next) {
   const { cardId } = req.params;
-  const { _id: userId } = req.user;
+  const { userId } = req.user;
 
   Card
     .findByIdAndUpdate(
@@ -59,7 +59,7 @@ function likeCard(req, res, next) {
 
 function dislikeCard(req, res, next) {
   const { cardId } = req.params;
-  const { _id: userId } = req.user;
+  const { userId } = req.user;
 
   Card
     .findByIdAndUpdate(
@@ -103,16 +103,18 @@ function deleteCard(req, res, next) {
 
       card
         .remove()
-        .then(() => res.send({ data: card }))
-        .catch(next);
+        .then(() => res.send({ data: card }));
+        // .catch(next);
     })
     .catch(next);
 }
 
 module.exports = {
   createCard,
+
   receiveCards,
   likeCard,
   dislikeCard,
+
   deleteCard,
 };

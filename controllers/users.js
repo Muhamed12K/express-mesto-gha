@@ -9,7 +9,11 @@ const InaccurateDataError = require('../errors/InaccurateDataError');
 
 function createUser(req, res, next) {
   const {
-    email, password, name, about, avatar,
+    email,
+    password,
+    name,
+    about,
+    avatar,
   } = req.body;
 
   bcrypt.hash(password, 10)
@@ -64,8 +68,10 @@ function loginUser(req, res, next) {
 }
 
 function getCurrentUserInfo(req, res, next) {
+  const { userId } = req.user;
+
   User
-    .findById(req._id)
+    .findById(userId)
     .then((user) => {
       if (user) return res.send({ user });
 
@@ -127,11 +133,17 @@ function updateUser(req, res, next) {
 
       throw new NotFoundError('Данные по указанному id не найдены');
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля пользователя'));
+      } else {
+        next(err);
+      }
+    });
 }
 
 function updateUserAvatar(req, res, next) {
-  const {avatar} = req.body;
+  const { avatar } = req.body;
   const { userId } = req.user;
 
   User
@@ -161,10 +173,12 @@ function updateUserAvatar(req, res, next) {
 
 module.exports = {
   createUser,
+  loginUser,
+
+  getCurrentUserInfo,
   getUsersInfo,
   getUserInfoId,
-  updateUserAvatar,
+
   updateUser,
-  loginUser,
-  getCurrentUserInfo
+  updateUserAvatar,
 };

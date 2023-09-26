@@ -28,7 +28,7 @@ const cardSchema= new Schema(
     owner: {
       type: ObjectId,
       ref: 'user',
-      required: [true, 'Owner is required']
+      required: true,
     },
 
     likes: [{
@@ -41,6 +41,9 @@ const cardSchema= new Schema(
       type: Date,
       default: Date.now,
     },
+  },
+  {
+    versionKey: false,
   },
 );
 
