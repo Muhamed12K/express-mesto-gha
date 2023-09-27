@@ -13,9 +13,6 @@ const {
 
 // add cards preffix
 router.post('/', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string().required(),
-  }).unknown(),
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     link: Joi.string()
@@ -27,27 +24,18 @@ router.post('/', celebrate({
 router.get('/',  receiveCards);
 
 router.put('/:cardId/likes', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string().required(),
-  }).unknown(),
   params: Joi.object().keys({
     cardId: Joi.string().length(24).hex().required(),
   }),
 }), likeCard);
 
 router.delete('/:cardId/likes', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string().required(),
-    params: Joi.object().keys({
-      cardId: Joi.string().length(24).hex().required(),
-    }),
-  }).unknown(),
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex().required(),
+  }),
 }), dislikeCard);
 
 router.delete('/:id', celebrate({
-  headers: Joi.object().keys({
-    authorization: Joi.string().required(),
-  }).unknown(),
   params: Joi.object().keys({
     id: Joi.string().length(24).hex().required(),
   }),
