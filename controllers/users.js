@@ -7,6 +7,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 const InaccurateDataError = require('../errors/InaccurateDataError');
 
+
 function createUser(req, res, next) {
   const {
     email,
