@@ -15,7 +15,7 @@ const { celebrate, Joi } = require('celebrate');
   router.get('/', getUsersInfo);
   router.get('/me', getCurrentUserInfo);
 
-  router.get('/:id', celebrate({
+  router.get( '/:id', celebrate({
     params: Joi.object().keys({
       cardId: Joi.string().length(24).hex().required(),
     }),

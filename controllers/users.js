@@ -68,11 +68,18 @@ function loginUser(req, res, next) {
     .catch(next);
 }
 
-function getCurrentUserInfo(req, res, next) {
-  const { userId } = req.user;
+function getUsersInfo(_, res, next) {
+  User
+    .find({})
+    .then((users) => res.send({ users }))
+    .catch(next);
+}
+
+function getUserInfoId(req, res, next) {
+  const { id } = req.params;
 
   User
-    .findById(userId)
+    .findById(id)
     .then((user) => {
       if (user) return res.send({ user });
 
@@ -87,18 +94,11 @@ function getCurrentUserInfo(req, res, next) {
     });
 }
 
-function getUsersInfo(_, res, next) {
-  User
-    .find({})
-    .then((users) => res.send({ users }))
-    .catch(next);
-}
-
-function getUserInfoId(req, res, next) {
-  const { id } = req.params;
+function getCurrentUserInfo(req, res, next) {
+  const { userId } = req.user;
 
   User
-    .findById(id)
+    .findById(userId)
     .then((user) => {
       if (user) return res.send({ user });
 
@@ -176,9 +176,9 @@ module.exports = {
   createUser,
   loginUser,
 
-  getCurrentUserInfo,
   getUsersInfo,
   getUserInfoId,
+  getCurrentUserInfo,
 
   updateUser,
   updateUserAvatar,
