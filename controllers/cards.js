@@ -92,7 +92,7 @@ function deleteCard(req, res, next) {
   const { userId } = req.user;
 
   Card
-    .findById({
+    .findOneAndDelete({
       _id: cardId,
     })
     .then((card) => {
@@ -101,10 +101,7 @@ function deleteCard(req, res, next) {
       const { owner: cardOwnerId } = card;
       if (cardOwnerId.valueOf() !== userId) throw new ForbiddenError('Нет прав доступа');
 
-      card
-        .remove()
-        .then(() => res.send({ data: card }))
-        .catch(next);
+      res.send({ data: card })
     })
     .catch(next);
 }
