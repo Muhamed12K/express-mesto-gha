@@ -101,7 +101,10 @@ function deleteCard(req, res, next) {
       const { owner: cardOwnerId } = card;
       if (cardOwnerId.valueOf() !== userId) throw new ForbiddenError('Нет прав доступа');
 
-      res.send({ data: card })
+      card
+        .deleteOne()
+        .then(() => res.send({ data: card }))
+        .catch(next);
     })
     .catch(next);
 }
