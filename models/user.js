@@ -7,7 +7,7 @@ const userSchema = new Schema(
   {
     email: {
       type: String,
-      required:true,
+      required: true,
       unique: true,
       validate: {
         validator: (email) => /.+@.+\..+/.test(email),
@@ -17,28 +17,28 @@ const userSchema = new Schema(
 
     password: {
       type: String,
-      required:true,
+      required: true,
       select: false,
-      minlength: 6
+      minlength: 6,
     },
 
     name: {
-      type:String,
+      type: String,
       default: 'Жак-Ив Кусто',
       validate: {
         validator(name) {
-          return name.length >= 2 && name.length <= 30
+          return name.length >= 2 && name.length <= 30;
         },
         message: 'Имя пользователя должно содержать от 2 до 30 символов',
       },
     },
 
     about: {
-      type:String,
+      type: String,
       default: 'Исследователь',
       validate: {
         validator(about) {
-          return about.length >= 2 && about.length <= 30
+          return about.length >= 2 && about.length <= 30;
         },
         message: 'Информация о пользователе должна содержать от 2 до 30 символов',
       },

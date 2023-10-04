@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Schema.Types;
 
-const cardSchema= new Schema(
+const cardSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
       validate: {
         validator(name) {
-          return name.length >= 2 && name.length <= 30
+          return name.length >= 2 && name.length <= 30;
         },
         message: 'Имя карточки должно быть длиной от 2 до 30 символов',
       },

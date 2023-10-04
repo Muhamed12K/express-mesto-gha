@@ -21,7 +21,7 @@ router.post('/', celebrate({
   }),
 }), createCard);
 
-router.get('/',  receiveCards);
+router.get('/', receiveCards);
 
 router.put('/:cardId/likes', celebrate({
   params: Joi.object().keys({

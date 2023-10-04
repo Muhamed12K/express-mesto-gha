@@ -1,12 +1,11 @@
-const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 const InaccurateDataError = require('../errors/InaccurateDataError');
-
 
 function createUser(req, res, next) {
   const {
@@ -28,14 +27,14 @@ function createUser(req, res, next) {
     .then((user) => {
       const { _id } = user;
 
-        return res.status(201).send({
-          email,
-          name,
-          about,
-          avatar,
-          _id,
-        });
-      })
+      return res.status(201).send({
+        email,
+        name,
+        about,
+        avatar,
+        _id,
+      });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким электронным адресом уже зарегистрирован'));
@@ -56,9 +55,9 @@ function loginUser(req, res, next) {
     .then(({ _id: userId }) => {
       if (userId) {
         const token = jwt.sign(
-          {userId},
+          { userId },
           secretSigningKey,
-          {expiresIn: '7d'},
+          { expiresIn: '7d' },
         );
 
         return res.send({ _id: token });
@@ -114,7 +113,7 @@ function getCurrentUserInfo(req, res, next) {
 }
 
 function updateUser(req, res, next) {
-  const {name, about} = req.body;
+  const { name, about } = req.body;
   const { userId } = req.user;
 
   User
@@ -130,7 +129,7 @@ function updateUser(req, res, next) {
       },
     )
     .then((user) => {
-      if (user) return res.send({user});
+      if (user) return res.send({ user });
 
       throw new NotFoundError('Данные по указанному id не найдены');
     })
