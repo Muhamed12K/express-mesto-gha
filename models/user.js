@@ -19,7 +19,7 @@ const userSchema = new Schema(
       type: String,
       required:true,
       select: false,
-      minLength: 6
+      minlength: 6
     },
 
     name: {
