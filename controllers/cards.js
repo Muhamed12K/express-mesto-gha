@@ -92,7 +92,7 @@ function deleteCard(req, res, next) {
   const { userId } = req.user;
 
   Card
-    .findOneAndDelete({
+    .findById({
       _id: cardId,
     })
     .then((card) => {
