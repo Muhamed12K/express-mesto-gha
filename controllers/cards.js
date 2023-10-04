@@ -106,7 +106,13 @@ function deleteCard(req, res, next) {
         .then(() => res.send({ data: card }))
         .catch(next);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new NotFoundError('Данные по указанному id не найдены'));
+      } else {
+        next(err);
+      }
+    });
 }
 
 module.exports = {
